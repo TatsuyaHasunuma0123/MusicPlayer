@@ -23,17 +23,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //再生する音楽の時間を管理するduration
     private Integer duration;
     //定期的にタスクを実行させるための変数time
-    Timer time = new Timer();
+    private Timer time = new Timer();
     //音楽の再生番号を管理
     private Integer musicNumber;
     //曲のタイトルを表示する
-    TextView title,length;
+    private TextView title,length;
+    private Integer musicFile[] = new Integer[3];
 
+    class music_struct{
+        Integer musicid[] = new Integer[musicFile.length];
+        String music_name[] = new String[musicFile.length];
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        musicFile[1] = R.raw.sample1;
+        musicFile[2] = R.raw.sample2;
+        musicFile[3] = R.raw.sample3;
 
         //musicNumberを初期化
         musicNumber = 1;
@@ -139,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public  void onClick(View view){
         //再生速度を変更するために必要な変数parms
-
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         /*--------------------APIレベル23以上を要求!! 23未満ではビルドエラー!!------------------------*/
         //APIレベル23以上でなければコメントアウトをお願いします。
@@ -219,17 +227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setMusic(){
-        if (musicNumber == 1){
-            player = MediaPlayer.create(this,R.raw.sample1);
-            musicNumber = 2;
-        }
-        else if(musicNumber == 2){
-            player = MediaPlayer.create(this, R.raw.sample2);
-            musicNumber = 3;
-        }
-        else if(musicNumber == 3){
-            player = MediaPlayer.create(this, R.raw.sample3);
-            musicNumber = 1;
-        }
+        player = MediaPlayer.create(this, musicFile[musicNumber]);
+        musicNumber = musicNumber % musicFile.length + 1;
     }
 }
