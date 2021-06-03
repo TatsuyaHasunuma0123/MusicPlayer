@@ -18,28 +18,38 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     /*--------------------------MediaPlayer関連のフィールド-----------------------------------------*/
     //再生する音楽のデータを入れるMusicPlayer
-    private MediaPlayer player = null;
-    //再生ボタンのフィールドを用意（ボタンの画像変更のため）
-    private ImageButton music_playback;
-    //再生する音楽の時間を管理するduration
+    private MediaPlayer player;
+
+    //再生する音楽の時間を管理する
     private Integer duration;
     //音楽の再生番号を管理
     private Integer musicNumber;
+    //音楽の現在の再生位置を管理
     private Integer now;
     /*--------------------------------------------------------------------------------------------*/
 
+
+    /*---------------------------------Layout関連--------------------------------------------------*/
     //曲のタイトル、時間、アイコン画像を表示する変数
-    private TextView title,musicLength,progress;
+    private TextView title,musicLength,nowProgress;
     private ImageView imageView;
+    //再生ボタン（ボタンの画像変更のため）
+    private ImageButton music_playback;
+    /*--------------------------------------------------------------------------------------------*/
+
 
     //定期的にタスクを実行させるための変数time
     private Timer time = new Timer();
 
-    //楽曲の番号、タイトル、アイコン画像を管理するMusicクラス
+
+    /*-----------------楽曲の番号、タイトル、アイコン画像を管理するMusicクラス--------------------------*/
     private Music musics[] = new Music[3];
     class Music{
+        //音楽の番号
         Integer id;
+        //音楽のタイトル
         String title;
+        //音楽のアイコン画像
         Integer image;
         Music(Integer id, String title, Integer image){
             this.id = id;
@@ -47,12 +57,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             this.image = image;
         }
     }
+    /*---------------------------------------------------------------------------------------------*/
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //音楽の番号、タイトル、画像を設定
         musics[0] = new Music(R.raw.sample1,"Sample1",R.drawable.ic_launcher_round);
         musics[1] = new Music(R.raw.sample2,"Sample2", R.drawable.sample2);
         musics[2] = new Music(R.raw.sample3,"Sample3",R.drawable.sample3);
@@ -61,13 +74,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //musicNumberを初期化
         musicNumber = 0;
 
-        //textView取得
+        //textViewの設定
         title = findViewById(R.id.textView_title);
         musicLength = findViewById(R.id.textView_time);
-        progress = findViewById(R.id.textView_progress);
-        progress.setText("0");
+        nowProgress = findViewById(R.id.textView_progress);
 
-        //imageViewを取得
+        //imageViewの設定
         imageView = findViewById(R.id.imageView);
 
         /*-----------------------------------イメージボタンの設定-----------------------------------*/
@@ -111,10 +123,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected  void onResume(){
         super.onResume();
         setMusic();
+        changeImageButton();
+
+        nowProgress.setText("0:00");
 
         //ファイルの長さを取得し、その値をseekBarの最大値とする
         duration = player.getDuration();
         SeekBar seekBar = findViewById(R.id.seekBar);
+        seekBar.setProgress(0);
         seekBar.setMax(duration);
 
         //1秒毎にタスクを実行するtime.schedule
@@ -125,9 +141,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(player.isPlaying()) {
                     now = player.getCurrentPosition();
                     seekBar.setProgress(now);
+
+                    //曲が最後まで再生された場合、次の曲へ
+                    if(presentTimeFormat(now).equals(presentTimeFormat(duration))) {
+                        //musicNumberを次の曲に設定
+                        musicNumber = (musicNumber + 1) % musics.length;
+                        //UI変更のため、メインスレッドでの動作を行う。
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                onResume();
+                                player.start();
+                            }
+                        });
+                    }
                 }
             }
-        },10,5000);
+        },10,1000);
 
         seekBar.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
@@ -136,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onProgressChanged(SeekBar seekbar, int progress, boolean fromUser) {
                         //ドラッグされた位置まで楽曲の再生位置を移動
                         player.seekTo(progress);
+                        //nowProgressに現在の再生位置を表示
+                        nowProgress.setText(presentTimeFormat(progress));
                     }
                     //つまみがタッチされた時に呼ばれる
                     @Override
@@ -143,18 +175,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if(player.isPlaying()) {
                             //一時停止
                             player.pause();
-                            //一時停止されるため、再生ボタンの画像をplayに変更
-                            music_playback.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                            changeImageButton();
                         }
                     }
                     //つまみがリリースされた時に呼ばれる
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-                        if(player.isPlaying()){
-                            player.start();
-                            //再生されるため、再生ボタンの画像をpauseに変更
-                            music_playback.setImageResource(R.drawable.ic_baseline_pause_24);
-                        }
+                        player.start();
+                        changeImageButton();
                     }
                 });
     }
@@ -167,11 +195,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public  void onClick(View view){
-        //再生速度を変更するために必要な変数parms
+
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         /*--------------------APIレベル23以上を要求!! 23未満ではビルドエラー!!------------------------*/
         //APIレベル23以上でなければコメントアウトをお願いします。
         //「MusicPlayer_y3033906/app/src/build.grade」のminSdkVersionを実機のAPIレベルに変更してください。
+        //再生速度を変更するために必要な変数parms
         PlaybackParams params = new PlaybackParams();
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
@@ -181,23 +210,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //再生状態であれば一時停止
                 if (player.isPlaying()) {
                     player.pause();
-                    //画像変更
-                    music_playback.setImageResource(R.drawable.ic_baseline_play_arrow_24);
                 }
                 //一時停止状態であれば再生
                 else {
                     player.start();
-                    //画像変更
-                    music_playback.setImageResource(R.drawable.ic_baseline_pause_24);
-                    //1秒毎にタスクを実行するtime.schedule
-                    time.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            now = player.getCurrentPosition();
-                            progress.setText("Hello");
-                        }
-                    },10,5000);
                 }
+                changeImageButton();
                 break;
             /*------------------------------------------------------------------------------------*/
 
@@ -206,22 +224,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.speed0_5:
                 params.setSpeed(0.5f);
                 player.setPlaybackParams(params);
+                //一時停止状態の場合でもそのまま再生されてしまうため、
+                //一時停止の処理を行う。
+                player.pause();
                 break;
             case R.id.speed0_75:
                 params.setSpeed(0.75f);
                 player.setPlaybackParams(params);
+                player.pause();
                 break;
             case R.id.speed1:
                 params.setSpeed(1.f);
                 player.setPlaybackParams(params);
+                player.pause();
                 break;
             case R.id.speed1_5:
                 params.setSpeed(1.5f);
                 player.setPlaybackParams(params);
+                player.pause();
                 break;
             case R.id.speed2:
                 params.setSpeed(2.f);
                 player.setPlaybackParams(params);
+                player.pause();
                 break;
              /*-----------------------------------------------------------------------------------*/
 
@@ -254,29 +279,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //「→→」ボタン
             case R.id.button_next:
-                //音楽を止め、musicNumberを次の曲に設定し、再びsetMusic
+                //音楽を止め、musicNumberを次の曲に設定
+                //再生位置を0に戻す
                 player.stop();
                 musicNumber = (musicNumber+1) % musics.length ;
-                setMusic();
+                onResume();
                 break;
+            //「←←」ボタン
             case R.id.button_back:
-                duration = 0;
-                player.seekTo(duration);
+                now = 0;
+                player.seekTo(now);
                 break;
         }
     }
 
     //曲を読み込み、画面に表示される曲タイトル、アイコン画像を変更する
-    public void setMusic(){ player = MediaPlayer.create(this, musics[musicNumber].id);
+    public void setMusic(){
+        player = MediaPlayer.create(this, musics[musicNumber].id);
         title.setText(musics[musicNumber].title);
-        musicLength.setText(getMinSec(player.getDuration()));
+        musicLength.setText(presentTimeFormat(player.getDuration()));
         imageView.setImageResource(musics[musicNumber].image);
     }
 
-    private String getMinSec(Integer duration) {
+    //単位がmsのdurationを「〇：〇〇」という文字列に変換する
+    public String presentTimeFormat(Integer duration) {
+        //分単位の取得 60000ms = 60s
         Integer minutes = duration / 60000;
+        //秒単位の取得 1000ms = 1s
         Integer seconds = (duration % 60000) / 1000;
         String progress =  minutes + ":" + String.format("%02d",seconds);
         return progress;
+    }
+
+    //中央の再生ボタンの画像を曲の再生状態に応じて変更
+    public void changeImageButton(){
+        if(player.isPlaying())
+            music_playback.setImageResource(R.drawable.ic_baseline_pause_24);
+        else if (!player.isPlaying())
+            music_playback.setImageResource(R.drawable.ic_baseline_play_arrow_24);
     }
 }
