@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         seekBar.setProgress(0);
         seekBar.setMax(duration);
 
-        //1秒毎にタスクを実行するtime.schedule
+        /*---------------------1秒毎にタスクを実行するtime.schedule----------------------------------*/
         time.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -146,18 +146,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if(presentTimeFormat(now).equals(presentTimeFormat(duration))) {
                         //musicNumberを次の曲に設定
                         musicNumber = (musicNumber + 1) % musics.length;
+
                         //UI変更のため、メインスレッドでの動作を行う。
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 onResume();
                                 player.start();
+                                changeImageButton();
                             }
                         });
+
                     }
                 }
             }
-        },10,1000);
+        },10,1000); //10msのdelay //1000ms = 1s 毎に実行
+        /*----------------------------------------------------------------------------------------*/
 
         seekBar.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
@@ -173,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onStartTrackingTouch(SeekBar seekBar) {
                         if(player.isPlaying()) {
-                            //一時停止
                             player.pause();
                             changeImageButton();
                         }
@@ -187,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
+    //メモリの解放
     @Override
     protected void onPause(){
         super.onPause();
@@ -269,9 +273,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //現在の再生位置を取得し、10000ms(10秒)戻す
                     Integer now = player.getCurrentPosition();
                     Integer seekTime = now - 10000;
+
                     //０よりも小さくなった場合、0に戻す
                     if(seekTime < 0)
                         seekTime = 0;
+
                     player.seekTo(seekTime);
                 }
                 break;
@@ -295,9 +301,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //曲を読み込み、画面に表示される曲タイトル、アイコン画像を変更する
     public void setMusic(){
+        //曲を取得
         player = MediaPlayer.create(this, musics[musicNumber].id);
+        //曲のタイトルを設定
         title.setText(musics[musicNumber].title);
+        //曲の長さを設定
         musicLength.setText(presentTimeFormat(player.getDuration()));
+        //曲のアイコンを設定
         imageView.setImageResource(musics[musicNumber].image);
     }
 
