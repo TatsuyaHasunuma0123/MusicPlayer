@@ -231,26 +231,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //一時停止状態の場合でもそのまま再生されてしまうため、
                 //一時停止の処理を行う。
                 player.pause();
+                player.start();
                 break;
             case R.id.speed0_75:
                 params.setSpeed(0.75f);
                 player.setPlaybackParams(params);
                 player.pause();
+                player.start();
                 break;
             case R.id.speed1:
                 params.setSpeed(1.f);
                 player.setPlaybackParams(params);
                 player.pause();
+                player.start();
                 break;
             case R.id.speed1_5:
                 params.setSpeed(1.5f);
                 player.setPlaybackParams(params);
                 player.pause();
+                player.start();
                 break;
             case R.id.speed2:
                 params.setSpeed(2.f);
                 player.setPlaybackParams(params);
                 player.pause();
+                player.start();
                 break;
              /*-----------------------------------------------------------------------------------*/
 
@@ -293,8 +298,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             //「←←」ボタン
             case R.id.button_back:
-                now = 0;
-                player.seekTo(now);
+                player.stop();
+                if(musicNumber == 0)
+                    musicNumber = musics.length - 1;
+                else
+                    musicNumber = musicNumber - 1;
+
+                onResume();
                 break;
         }
     }
