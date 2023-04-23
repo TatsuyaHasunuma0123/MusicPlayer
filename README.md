@@ -1,4 +1,4 @@
-![imga screenshot](./images/img1.png)
+![imga screenshot](./images/img1.png) ![imgb screenshot](./images/img2.png) ![imgc screenshot](./images/img3.png)
 
 # 🎵 MusicPlayer  
 
