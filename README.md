@@ -1,4 +1,6 @@
-# :pencil: Canvas  
+![imga screenshot](./images/img1.png)
+
+# 🎵 MusicPlayer  
 
 ## Demo
 [Here](https://drive.google.com/file/d/1kA0BCeKgMvYR4jIPhoMPGwYIFZ7SE8dj/view?usp=sharing) is a demonstration video.
