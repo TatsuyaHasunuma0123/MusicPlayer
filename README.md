@@ -1,5 +1,3 @@
-![imga screenshot](./images/img1.png)　![imgb screenshot](./images/img2.png)  ![imgb screenshot](./images/img3.png)  
-
 # :pencil: Canvas  
 
 ## Demo
