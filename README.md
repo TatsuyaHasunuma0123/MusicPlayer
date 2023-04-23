@@ -6,7 +6,7 @@
 [Here](https://drive.google.com/file/d/1kA0BCeKgMvYR4jIPhoMPGwYIFZ7SE8dj/view?usp=sharing) is a demonstration video.
 
 ## My other portfolio is here .
-- :pencil:[Canvas](https://github.com/TatsuyaHasunuma0123/Canvas)
+- 📝[Canvas](https://github.com/TatsuyaHasunuma0123/Canvas)
 - 📆[Twitter Calender](https://github.com/TatsuyaHasunuma0123/Calendar)
 - 🕸️[Discussion Web](https://github.com/TatsuyaHasunuma0123/Discuss)
   
@@ -18,6 +18,15 @@
 ```
 git clone https://github.com/TatsuyaHasunuma0123/MusicPlayer
 ```
+**:collision: werning**: API Level >> 23.  
+Change the minSdkVersion in `app/src/build.gradle` to the API level of your actual device.
 
- **:collision: werning**: API Level >> 23.  
- Change the minSdkVersion in `app/src/build.gradle` to the API level of your actual device.
+-Set music on `res/raw` and images `drawable` and add code `MainActivity.onCreate`  
+😞 I have to　implement this function in my app...
+ 
+## Button Guides
+- ⏯️ pause and play
+- ⏭️ track change
+- ✖️ change speed
+- ➡️ Skip or rewind 10 seconds
+- ➖ By moveing sideways this, you can play from your favorite position
