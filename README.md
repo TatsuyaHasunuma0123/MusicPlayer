@@ -2,7 +2,7 @@
 
 # 🎵 MusicPlayer  
 
-## Demo
+## 🎥 Demo
 [Here](https://drive.google.com/file/d/1YzpoULIvCi_bBl6aMO38xbyxH8ObpGdJ/view?usp=sharing) is a demonstration video.  
 Since this is being executed on an emulator, there will be no sound. However, if you run it on an actual device, there will be sound.
 
