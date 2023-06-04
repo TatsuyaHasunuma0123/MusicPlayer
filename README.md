@@ -6,10 +6,11 @@
 [Here](https://drive.google.com/file/d/1YzpoULIvCi_bBl6aMO38xbyxH8ObpGdJ/view?usp=sharing) is a demonstration video.  
 Since this is being executed on an emulator, there will be no sound. However, if you run it on an actual device, there will be sound.
 
-## My other portfolio is here .
+## My other App is here .
 - 📝[Canvas](https://github.com/TatsuyaHasunuma0123/Canvas)
-- 📆[Twitter Calender](https://github.com/TatsuyaHasunuma0123/Calendar)
+- 📆[Twitter Calender](https://github.com/TatsuyaHasunuma0123/TwitterCalendar)
 - 🕸️[Discussion Web](https://github.com/TatsuyaHasunuma0123/Discuss)
+- 🗾[population_graph](https://github.com/TatsuyaHasunuma0123/population_graph)
   
 ## Usage
 - Install the latest version from the [official AndroidStudio app](https://developer.android.com/studio). 
